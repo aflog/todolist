@@ -1,0 +1,38 @@
+CREATE DATABASE IF NOT EXISTS `todolist`;
+
+CREATE TABLE IF NOT EXISTS `todolist`.`item` (
+	`id` INT(6) NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+	`description` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci,
+	`status` BOOLEAN NOT NULL DEFAULT false,
+	`due` DATETIME,
+	`created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `todolist`.`comment` (
+    `id` INT(6) NOT NULL AUTO_INCREMENT,
+    `itemId` INT(6) NOT NULL,
+    `comment` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`itemId`) 
+        REFERENCES `item`(`id`) 
+        ON DELETE CASCADE,
+    INDEX (`itemId`)
+);
+
+CREATE TABLE IF NOT EXISTS `todolist`.`label` (
+    `id` INT(6) NOT NULL AUTO_INCREMENT,
+    `itemId` INT(6) NOT NULL,
+    `label` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+    `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`itemId`)
+        REFERENCES `item`(`id`)
+        ON DELETE CASCADE,
+    INDEX (`itemId`)
+);
