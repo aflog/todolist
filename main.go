@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/aflog/todolist/handler"
 	"github.com/aflog/todolist/repository/mysql"
@@ -29,7 +30,7 @@ func main() {
 	}
 	defer app.db.Close()
 
-	app.Run(":8000")
+	app.Run(":8080")
 }
 
 //Health handler sends an alive response
@@ -86,12 +87,22 @@ type App struct {
 func (a *App) Initialize(c Config) error {
 	a.conf = c
 	var err error
+
 	// initialize the DB
 	a.db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@(%s:%s)/%s?parseTime=true", a.conf.MysqlUser, a.conf.MysqlPwd, a.conf.MysqlHost, a.conf.MysqlPort, a.conf.MysqlBDName))
 	if err != nil {
 		return err
 	}
-	err = a.db.Ping()
+
+	// in case that the mysql just started we give it a bit of time
+	for i := 0; i < 10; i++ {
+		err = a.db.Ping()
+		if err == nil {
+			break
+		}
+		log.Println("Waiting for mysql: sleep for 5s")
+		time.Sleep(5 * time.Second)
+	}
 	if err != nil {
 		return err
 	}
